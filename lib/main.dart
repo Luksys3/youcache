@@ -16,6 +16,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Ubuntu',
         brightness: Brightness.dark,
+        accentColor: Color(PRIMARY_COLOR),
         primarySwatch: MaterialColor(
           PRIMARY_COLOR,
           PRIMARY_SWATCH,
