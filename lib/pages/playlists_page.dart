@@ -7,14 +7,21 @@ import 'package:youcache/models/playlist.dart';
 import 'package:youcache/notifiers/playlists_notifier.dart';
 import 'package:youcache/notifiers/route_notifier.dart';
 import 'package:youcache/services/playlists_service.dart';
+import 'package:youcache/services/songs_service.dart';
 import 'package:youcache/widgets/layout/layout.dart';
 
 class PlaylistsPage extends StatelessWidget {
   void _startRefetch({
     required BuildContext context,
     required String playlistId,
-  }) {
-    print('Starting refetch for playlist "$playlistId".');
+  }) async {
+    final updateSuccess =
+        await context.read<PlaylistsService>().updateFromApi(playlistId);
+    if (!updateSuccess) {
+      return;
+    }
+    await context.read<SongsService>().createFromApi(playlistId);
+    await context.read<PlaylistsNotifier>().load();
   }
 
   void _showDeleteDialog({

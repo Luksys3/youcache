@@ -1,45 +1,47 @@
 class Song {
-  final String _id;
-  final String _name;
-  final String _imageUrl;
-  final String _length;
-  final bool _downloaded;
+  final String id;
+  final String playlistId;
+  final String videoId;
+  final String name;
+  final String? imageUrl;
+  final String status;
+  final String? ownerChannelTitle;
+  final bool downloaded;
 
   Song({
-    required id,
-    required name,
-    required imageUrl,
-    required length,
-    required downloaded,
-  })   : _id = id,
-        _name = name,
-        _imageUrl = imageUrl,
-        _length = length,
-        _downloaded = downloaded;
-
-  String get id => _id;
-  String get name => _name;
-  String get imageUrl => _imageUrl;
-  String get length => _length;
-  bool get downloaded => _downloaded;
+    required this.id,
+    required this.playlistId,
+    required this.videoId,
+    required this.name,
+    required this.imageUrl,
+    required this.status,
+    required this.ownerChannelTitle,
+    required this.downloaded,
+  });
 
   Map<String, dynamic> toMap() {
     return {
-      'id': _id,
-      'name': _name,
-      'imageUrl': _imageUrl,
-      'length': _length,
-      'downloaded': _downloaded,
+      'id': id,
+      'playlistId': playlistId,
+      'videoId': videoId,
+      'name': name,
+      'imageUrl': imageUrl,
+      'status': status,
+      'ownerChannelTitle': ownerChannelTitle,
+      'downloaded': downloaded ? 1 : 0,
     };
   }
 
   factory Song.fromJson(Map<String, dynamic> json) {
     return Song(
       id: json['id'],
+      playlistId: json['playlistId'],
+      videoId: json['videoId'],
       name: json['name'],
       imageUrl: json['imageUrl'],
-      length: json['length'],
-      downloaded: json['downloaded'],
+      status: json['status'],
+      ownerChannelTitle: json['ownerChannelTitle'],
+      downloaded: json['downloaded'] == 1 ? true : false,
     );
   }
 }

@@ -97,7 +97,46 @@ class PlaylistsService with ChangeNotifier {
     }
   }
 
+  Future<bool> update(Playlist playlist) async {
+    final db = await _database.database;
+
+    try {
+      await db.update(
+        'playlists',
+        {'itemCount': playlist.itemCount},
+        where: "id = ?",
+        whereArgs: [playlist.id],
+      );
+      return true;
+    } on DatabaseException {
+      showSnackBar(
+        _context,
+        'Failed to update playlist.',
+        type: SnackBarTypeEnum.ERROR,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> updateFromApi(String playlistId) async {
+    final playlist = await _getFromApi(playlistId);
+    if (playlist == null) {
+      return false;
+    }
+
+    return await update(playlist);
+  }
+
   Future<bool> createFromApi(String playlistId) async {
+    final playlist = await _getFromApi(playlistId);
+    if (playlist == null) {
+      return false;
+    }
+
+    return await create(playlist);
+  }
+
+  Future<Playlist?> _getFromApi(String playlistId) async {
     final response = await _fetchService.get(
       url: 'https://youtube.googleapis.com/youtube/v3/playlists',
       query: {
@@ -107,18 +146,8 @@ class PlaylistsService with ChangeNotifier {
       },
     );
 
-    // final response = await _fetchService.get(
-    //   url: 'https://youtube.googleapis.com/youtube/v3/playlistItems',
-    //   query: {
-    //     'key': ENV.YOUTUBE_API_KEY,
-    //     'part': 'contentDetails',
-    //     'maxResults': 20,
-    //     'playlistId': playlistId
-    //   },
-    // );
-
     if (response == null) {
-      return false;
+      return null;
     }
 
     final body = jsonDecode(response.body);
@@ -128,17 +157,15 @@ class PlaylistsService with ChangeNotifier {
         'Playlist was not found or it cannot be accessed via link.',
         type: SnackBarTypeEnum.ERROR,
       );
-      return false;
+      return null;
     }
 
-    final Playlist playlist = Playlist(
+    return Playlist(
       id: playlistId,
       name: body['items'][0]['snippet']['title'],
       imageUrl: body['items'][0]['snippet']['thumbnails']['default']['url'],
       itemCount: body['items'][0]['contentDetails']['itemCount'],
       downloadedItemCount: 0,
     );
-
-    return await create(playlist);
   }
 }

@@ -6,6 +6,7 @@ import 'package:youcache/notifiers/route_notifier.dart';
 import 'package:youcache/services/database_service.dart';
 import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/services/playlists_service.dart';
+import 'package:youcache/services/songs_service.dart';
 import 'package:youcache/widgets/app_navigator.dart';
 
 void main() {
@@ -35,6 +36,9 @@ class App extends StatelessWidget {
             create: (context) => PlaylistsService(context),
           ),
           ChangeNotifierProvider(
+            create: (context) => SongsService(context),
+          ),
+          ChangeNotifierProvider(
             create: (_) => DatabaseService(),
           ),
           ChangeNotifierProvider(
@@ -49,8 +53,10 @@ class App extends StatelessWidget {
           final fetchService = context.read<FetchService>();
           final playlistsNotifier = context.read<PlaylistsNotifier>();
           final playlistsService = context.read<PlaylistsService>();
+          final songsService = context.read<SongsService>();
 
           playlistsService.init(database: database, fetchService: fetchService);
+          songsService.init(database: database, fetchService: fetchService);
           playlistsNotifier.init(playlistsService: playlistsService);
 
           return AppNavigator();

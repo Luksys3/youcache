@@ -1,19 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:youcache/models/playlist.dart';
 import 'package:youcache/models/song.dart';
+import 'package:youcache/services/songs_service.dart';
 import 'package:youcache/widgets/layout/layout.dart';
 
-class PlaylistPage extends StatelessWidget {
+class PlaylistPage extends StatefulWidget {
   final Playlist playlist;
 
   PlaylistPage({required this.playlist});
 
   @override
+  _PlaylistPageState createState() => _PlaylistPageState();
+}
+
+class _PlaylistPageState extends State<PlaylistPage> {
+  bool _loaded = false;
+  List<Song> _songs = [];
+
+  _load() async {
+    final songs = await context.read<SongsService>().all(widget.playlist.id);
+    if (mounted) {
+      setState(() {
+        _loaded = true;
+        _songs = songs;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<Song> songs = [];
+    if (!_loaded) {
+      _load();
+    }
 
     return Layout(
-      title: playlist.name,
+      title: widget.playlist.name,
       showBackButton: true,
       child: Container(
         child: Container(
@@ -22,13 +44,16 @@ class PlaylistPage extends StatelessWidget {
           ),
           child: ListView.separated(
             separatorBuilder: (_, __) => Divider(),
-            itemCount: songs.length,
+            itemCount: _songs.length,
             itemBuilder: (BuildContext context, int index) {
-              Song song = songs[index];
+              final song = _songs[index];
+              final imageUrl = song.imageUrl;
               return ListTile(
                 title: Text(song.name),
-                subtitle: Text(song.length),
-                leading: Container(child: Image.network(playlist.imageUrl)),
+                subtitle: Text(song.ownerChannelTitle ?? '-'),
+                leading: imageUrl == null
+                    ? null
+                    : Container(child: Image.network(imageUrl)),
               );
             },
           ),
