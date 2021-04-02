@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
 
-class FetchService {
+class FetchService extends ChangeNotifier {
   final BuildContext context;
 
   FetchService(this.context);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:youcache/enums/route_enum.dart';
 
 class RouteNotifier with ChangeNotifier {
-  List<RouteEnum> _path = [RouteEnum.PLAYLISTS];
+  List<RouteEnum> _path = [RouteEnum.PLAYER];
 
   List<RouteEnum> get path => _path;
   RouteEnum get active => _path.last;

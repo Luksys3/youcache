@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
+import 'package:youcache/notifiers/playlists_notifier.dart';
+import 'package:youcache/notifiers/route_notifier.dart';
 import 'package:youcache/services/fetch_service.dart';
+import 'package:youcache/services/playlists_service.dart';
 import 'package:youcache/widgets/field.dart';
 import 'package:youcache/widgets/layout/layout.dart';
-import 'package:youcache/.env.dart' as ENV;
 
 class PlaylistCreatePage extends StatefulWidget {
   @override
@@ -32,7 +34,13 @@ class _PlaylistCreatePageState extends State<PlaylistCreatePage> {
     }
   }
 
-  void _submit(BuildContext context, FetchService fetch) async {
+  void _submit({
+    required BuildContext context,
+    required FetchService fetch,
+    required PlaylistsNotifier playlists,
+    required PlaylistsService playlistsService,
+    required RouteNotifier route,
+  }) async {
     final state = _formKey.currentState;
     if (state == null || !state.validate()) {
       return;
@@ -50,49 +58,57 @@ class _PlaylistCreatePageState extends State<PlaylistCreatePage> {
       return;
     }
 
-    final response = await fetch.get(
-      url: 'https://youtube.googleapis.com/youtube/v3/playlistItems',
-      query: {
-        'key': ENV.YOUTUBE_API_KEY,
-        'part': 'contentDetails',
-        'maxResults': 20,
-        'playlistId': playlistId
-      },
-    );
-
-    if (response != null) {
+    final response = await playlistsService.createFromApi(playlistId);
+    if (response) {
       showSnackBar(
         context,
         'Playlist has been added successfully!',
       );
-      print(response.body);
+      route.back();
     }
+  }
+
+  _buildLinkField() {
+    return Field(
+      label: 'Playlist YouTube link',
+      helperText: 'Playlist must be set to be accessible via provided link.',
+      name: 'link',
+      onSaved: _onSaved,
+      value:
+          'https://www.youtube.com/playlist?list=PLdqLrUHHfXcWwRzR2QGeAlFRUS0yilRro',
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'This field is required.';
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final fetch = context.read<FetchService>();
+    final playlists = context.read<PlaylistsNotifier>();
+    final playlistsService = context.read<PlaylistsService>();
+    final route = context.read<RouteNotifier>();
 
     return Layout(
       title: 'Add new Playlist',
       formPage: true,
-      onSave: () => _submit(context, fetch),
+      onSave: () => _submit(
+        context: context,
+        fetch: fetch,
+        playlists: playlists,
+        playlistsService: playlistsService,
+        route: route,
+      ),
       child: Container(
         padding: EdgeInsets.all(20),
         child: Form(
           key: _formKey,
-          child: Field(
-            label: 'Playlist YouTube link',
-            helperText:
-                'Playlist must be set to be accessible via provided link.',
-            name: 'link',
-            autofocus: true,
-            onSaved: _onSaved,
-            validator: (value) {
-              if (value.isEmpty) {
-                return 'This field is required.';
-              }
-            },
+          child: Column(
+            children: [
+              _buildLinkField(),
+            ],
           ),
         ),
       ),
