@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class Field extends StatelessWidget {
   final String label;
   final String name;
+  final String? value;
   final String? error;
   final Map<String, String>? errors;
   final String? Function(String)? validator;
@@ -11,12 +12,14 @@ class Field extends StatelessWidget {
   final bool obscureText;
   final bool last;
   final bool autofocus;
+  final String? helperText;
   final TextCapitalization textCapitalization;
 
   Field({
     required this.label,
     required this.name,
     this.error,
+    this.value,
     this.errors,
     this.validator,
     this.onSaved,
@@ -24,6 +27,7 @@ class Field extends StatelessWidget {
     this.obscureText = false,
     this.last = true,
     this.autofocus = false,
+    this.helperText,
     this.textCapitalization = TextCapitalization.none,
   });
 
@@ -32,15 +36,13 @@ class Field extends StatelessWidget {
     return TextFormField(
       decoration: InputDecoration(
         labelText: label,
+        helperText: helperText,
         errorText: errors?[this.name],
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(
             color: Colors.grey[600]!,
           ),
         ),
-        labelStyle: TextStyle(
-            // color: Color(0xff7D8EA7),
-            ),
       ),
       validator: (value) {
         if (value == null) {
@@ -52,6 +54,7 @@ class Field extends StatelessWidget {
         }
       },
       textCapitalization: textCapitalization,
+      initialValue: value,
       autofocus: autofocus,
       obscureText: obscureText,
       keyboardType: keyboardType,

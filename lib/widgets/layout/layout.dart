@@ -60,7 +60,7 @@ class Layout extends StatelessWidget {
                     horizontal: 16,
                   ),
                   child: Text(
-                    'SAVE',
+                    'CREATE',
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),

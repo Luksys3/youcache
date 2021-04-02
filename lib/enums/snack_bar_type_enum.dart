@@ -1,0 +1,4 @@
+enum SnackBarTypeEnum {
+  INFO,
+  ERROR,
+}

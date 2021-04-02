@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youcache/constants/primary_swatch.dart';
 import 'package:youcache/notifiers/route_notifier.dart';
+import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/widgets/app_navigator.dart';
 
 void main() {
@@ -24,6 +25,7 @@ class App extends StatelessWidget {
       ),
       home: MultiProvider(
         providers: [
+          Provider<FetchService>(create: (context) => FetchService(context)),
           ChangeNotifierProvider(create: (_) => RouteNotifier()),
         ],
         child: AppNavigator(),
