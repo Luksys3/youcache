@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqlite_api.dart';
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
@@ -8,6 +10,7 @@ import 'package:youcache/models/song.dart';
 import 'package:youcache/services/database_service.dart';
 import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/.env.dart' as ENV;
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class SongsService with ChangeNotifier {
   late DatabaseService _database;
@@ -137,7 +140,10 @@ class SongsService with ChangeNotifier {
         continue;
       }
 
-      // TODO: download song
+      final downloadSuccess = await _downloadSong(song);
+      if (!downloadSuccess) {
+        continue;
+      }
 
       final success = await create(songs[index]);
       if (success) {
@@ -161,5 +167,49 @@ class SongsService with ChangeNotifier {
     );
 
     return true;
+  }
+
+  Future<bool> _downloadSong(Song song) async {
+    try {
+      final yt = YoutubeExplode();
+
+      final manifest = await yt.videos.streamsClient.getManifest(song.videoId);
+
+      final streamInfo = manifest.audioOnly.withHighestBitrate();
+
+      final streams = yt.videos.streamsClient.get(streamInfo);
+
+      final songsDirectory =
+          Directory(await getSongsDirectoryPath(song.playlistId));
+      if (!songsDirectory.existsSync()) {
+        songsDirectory.createSync();
+      }
+
+      final file = File(await getSongFilePath(song));
+      final fileStream = file.openWrite();
+
+      await streams.pipe(fileStream);
+
+      await fileStream.flush();
+      await fileStream.close();
+    } catch (_) {
+      showSnackBar(
+        _context,
+        'Failed to download song "${song.name}".',
+        type: SnackBarTypeEnum.ERROR,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<String> getSongsDirectoryPath(String playlistId) async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${directory.path}/${playlistId.replaceAll('/', '')}';
+  }
+
+  Future<String> getSongFilePath(Song song) async {
+    return '${await getSongsDirectoryPath(song.playlistId)}/${song.id.replaceAll('/', '')}.mp3';
   }
 }

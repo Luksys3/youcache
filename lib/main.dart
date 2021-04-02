@@ -55,7 +55,11 @@ class App extends StatelessWidget {
           final playlistsService = context.read<PlaylistsService>();
           final songsService = context.read<SongsService>();
 
-          playlistsService.init(database: database, fetchService: fetchService);
+          playlistsService.init(
+            database: database,
+            fetchService: fetchService,
+            songsService: songsService,
+          );
           songsService.init(database: database, fetchService: fetchService);
           playlistsNotifier.init(playlistsService: playlistsService);
 

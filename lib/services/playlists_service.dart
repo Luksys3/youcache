@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -8,10 +9,12 @@ import 'package:youcache/models/playlist.dart';
 import 'package:youcache/services/database_service.dart';
 import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/.env.dart' as ENV;
+import 'package:youcache/services/songs_service.dart';
 
 class PlaylistsService with ChangeNotifier {
   late DatabaseService _database;
   late FetchService _fetchService;
+  late SongsService _songsService;
   final BuildContext _context;
 
   PlaylistsService(
@@ -21,9 +24,11 @@ class PlaylistsService with ChangeNotifier {
   init({
     required DatabaseService database,
     required FetchService fetchService,
+    required SongsService songsService,
   }) {
     _database = database;
     _fetchService = fetchService;
+    _songsService = songsService;
   }
 
   Future<List<Playlist>> all() async {
@@ -50,6 +55,10 @@ class PlaylistsService with ChangeNotifier {
     final db = await _database.database;
 
     try {
+      final songsDirectory =
+          Directory(await _songsService.getSongsDirectoryPath(playlistId));
+      songsDirectory.deleteSync(recursive: true);
+
       await db.delete(
         'playlists',
         where: "id = ?",
