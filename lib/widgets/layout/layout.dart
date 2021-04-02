@@ -8,6 +8,7 @@ class Layout extends StatelessWidget {
   final String title;
   final Widget child;
   final bool formPage;
+  final bool showBackButton;
   final void Function()? onSave;
   final FloatingActionButton? floatingActionButton;
 
@@ -15,6 +16,7 @@ class Layout extends StatelessWidget {
     required this.title,
     required this.child,
     this.formPage = false,
+    this.showBackButton = false,
     this.onSave,
     this.floatingActionButton,
   });
@@ -41,7 +43,7 @@ class Layout extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         backgroundColor: PRIMARY_SWATCH[700],
-        leading: formPage
+        leading: formPage || showBackButton
             ? IconButton(
                 icon: Icon(Icons.arrow_back_rounded),
                 iconSize: 26,

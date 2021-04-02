@@ -29,11 +29,21 @@ class PlaylistsService with ChangeNotifier {
   Future<List<Playlist>> all() async {
     final db = await _database.database;
 
-    final List<Map<String, dynamic>> playlistsRaw = await db.query('playlists');
+    try {
+      final List<Map<String, dynamic>> playlistsRaw =
+          await db.query('playlists');
 
-    return List.generate(playlistsRaw.length, (index) {
-      return Playlist.fromJson(playlistsRaw[index]);
-    });
+      return List.generate(playlistsRaw.length, (index) {
+        return Playlist.fromJson(playlistsRaw[index]);
+      });
+    } on DatabaseException {
+      showSnackBar(
+        _context,
+        'Failed to get playlists.',
+        type: SnackBarTypeEnum.ERROR,
+      );
+      return [];
+    }
   }
 
   Future<bool> delete(String playlistId) async {

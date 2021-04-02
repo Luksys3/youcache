@@ -3,17 +3,27 @@ import 'package:youcache/enums/route_enum.dart';
 
 class RouteNotifier with ChangeNotifier {
   List<RouteEnum> _path = [RouteEnum.PLAYER];
+  Map<String, dynamic> _arguments = {};
 
   List<RouteEnum> get path => _path;
+  Map<String, dynamic> get arguments => _arguments;
   RouteEnum get active => _path.last;
 
-  void change(RouteEnum route) {
+  void change(
+    RouteEnum route, {
+    Map<String, dynamic>? arguments,
+  }) {
     _path = [route];
+    _arguments = arguments == null ? {} : arguments;
     notifyListeners();
   }
 
-  void push(RouteEnum route) {
+  void push(
+    RouteEnum route, {
+    Map<String, dynamic>? arguments,
+  }) {
     _path.add(route);
+    _arguments = arguments == null ? {} : arguments;
     notifyListeners();
   }
 

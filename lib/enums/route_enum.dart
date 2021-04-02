@@ -1,5 +1,6 @@
 enum RouteEnum {
   PLAYER,
+  PLAYLIST,
   PLAYLISTS,
   PLAYLIST_CREATE,
   SETTINGS,

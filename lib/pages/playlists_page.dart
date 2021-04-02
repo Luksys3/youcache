@@ -98,6 +98,12 @@ class PlaylistsPage extends StatelessWidget {
                     subtitle: Text(
                       '${playlist.downloadedItemCount} / ${playlist.itemCount}',
                     ),
+                    onTap: () {
+                      context.read<RouteNotifier>().push(
+                        RouteEnum.PLAYLIST,
+                        arguments: {'playlist': playlist},
+                      );
+                    },
                     leading: Container(child: Image.network(playlist.imageUrl)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
