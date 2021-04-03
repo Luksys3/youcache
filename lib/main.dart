@@ -2,6 +2,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youcache/constants/primary_swatch.dart';
+import 'package:youcache/notifiers/playing_notifier.dart';
 import 'package:youcache/notifiers/playlists_notifier.dart';
 import 'package:youcache/notifiers/route_notifier.dart';
 import 'package:youcache/services/database_service.dart';
@@ -44,6 +45,9 @@ class App extends StatelessWidget {
           ),
           ChangeNotifierProvider(
             create: (_) => RouteNotifier(),
+          ),
+          ChangeNotifierProvider(
+            create: (_) => PlayingNotifier(),
           ),
           ChangeNotifierProvider(
             create: (context) => PlaylistsNotifier(context),

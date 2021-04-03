@@ -74,6 +74,11 @@ class SongsService with ChangeNotifier {
   }
 
   Future<bool> createFromApi(String playlistId) async {
+    showSnackBar(
+      _context,
+      'Started fetching playlist songs...',
+    );
+
     String? nextPageToken;
     List<Song> songs = [];
 

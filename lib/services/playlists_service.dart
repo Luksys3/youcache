@@ -8,6 +8,7 @@ import 'package:youcache/classes/audio_service_wrapper.dart';
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
 import 'package:youcache/models/playlist.dart';
+import 'package:youcache/models/song.dart';
 import 'package:youcache/services/database_service.dart';
 import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/.env.dart' as ENV;
@@ -33,30 +34,43 @@ class PlaylistsService with ChangeNotifier {
     _songsService = songsService;
   }
 
-  Future<void> play(Playlist playlist) async {
+  Future<void> play(Playlist playlist, {Song? song}) async {
     final songs = await _songsService.all(playlist.id);
 
     List<MediaItem> queue = [];
     for (int index = 0; index < songs.length; index++) {
-      final song = songs[index];
-      final pathToSong = await _songsService.getSongFilePath(song);
-      // print('pathToSong $index $pathToSong');
+      final songCurrent = songs[index];
+      final pathToSong = await _songsService.getSongFilePath(songCurrent);
       queue.add(
         MediaItem(
           // This can be any unique id, but we use the audio URL for convenience.
           id: pathToSong,
           album: playlist.name,
-          title: song.name,
-          artist: song.ownerChannelTitle,
-          duration: song.duration,
-          artUri: song.imageUrl == null ? null : Uri.parse(song.imageUrl!),
+          title: songCurrent.name,
+          artist: songCurrent.ownerChannelTitle,
+          duration: songCurrent.duration,
+          artUri: songCurrent.imageUrl == null
+              ? null
+              : Uri.parse(songCurrent.imageUrl!),
         ),
       );
     }
 
-    await AudioServiceWrapper.start();
+    try {
+      _play(queue: queue, song: song);
+    } catch (_) {
+      await AudioServiceWrapper.start();
+      _play(queue: queue, song: song);
+    }
+  }
 
+  Future<void> _play({required List<MediaItem> queue, Song? song}) async {
     await AudioService.updateQueue(queue);
+    if (song != null) {
+      await AudioService.skipToQueueItem(
+        await _songsService.getSongFilePath(song),
+      );
+    }
     await AudioService.play();
   }
 

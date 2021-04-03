@@ -79,7 +79,6 @@ class AudioPlayerTask extends BackgroundAudioTask {
     await _player.seek(Duration(milliseconds: 0), index: 0);
   }
 
-  @override
   Future<void> _updateQueue(List<MediaItem> queue) async {
     // Load and broadcast the queue
     AudioServiceBackground.setQueue(queue);

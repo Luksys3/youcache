@@ -10,7 +10,14 @@ import 'package:youcache/services/playlists_service.dart';
 import 'package:youcache/services/songs_service.dart';
 import 'package:youcache/widgets/layout/layout.dart';
 
-class PlaylistsPage extends StatelessWidget {
+class PlaylistsPage extends StatefulWidget {
+  @override
+  _PlaylistsPageState createState() => _PlaylistsPageState();
+}
+
+class _PlaylistsPageState extends State<PlaylistsPage> {
+  bool _loading = true;
+
   void _play({
     required BuildContext context,
     required Playlist playlist,
@@ -74,9 +81,16 @@ class PlaylistsPage extends StatelessWidget {
     );
   }
 
+  void _load(BuildContext context) async {
+    await context.read<PlaylistsNotifier>().load();
+    setState(() {
+      _loading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    context.read<PlaylistsNotifier>().load();
+    _load(context);
 
     return Layout(
       title: 'YouCache',
@@ -90,102 +104,116 @@ class PlaylistsPage extends StatelessWidget {
           context.read<RouteNotifier>().push(RouteEnum.PLAYLIST_CREATE);
         },
       ),
-      child: Consumer<PlaylistsNotifier>(
-        builder: (
-          BuildContext context,
-          PlaylistsNotifier playlists,
-          Widget? _,
-        ) {
-          return ListView.separated(
-            separatorBuilder: (_, __) => Divider(
-              height: 0,
-            ),
-            itemCount: playlists.playlists.length,
-            itemBuilder: (BuildContext context, int index) {
-              Playlist playlist = playlists.playlists[index];
-              return ListTile(
-                title: Text(
-                  playlist.name,
-                  style: TextStyle(fontSize: 14),
-                ),
-                subtitle: Text(
-                  '${playlist.downloadedItemCount} / ${playlist.itemCount}',
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 6,
-                ),
-                onTap: () {
-                  context.read<RouteNotifier>().push(
-                    RouteEnum.PLAYLIST,
-                    arguments: {'playlist': playlist},
-                  );
-                },
-                leading: Container(child: Image.network(playlist.imageUrl)),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.play_arrow_rounded,
-                        size: 28,
+      child: _loading
+          ? Container()
+          : Consumer<PlaylistsNotifier>(
+              builder: (
+                BuildContext context,
+                PlaylistsNotifier playlists,
+                Widget? _,
+              ) {
+                if (playlists.playlists.length == 0) {
+                  return Center(
+                    child: Text(
+                      'No playlists found',
+                      style: TextStyle(
+                        color: Colors.grey[600],
                       ),
-                      onPressed: () {
-                        _play(
-                          context: context,
-                          playlist: playlist,
+                    ),
+                  );
+                }
+
+                return ListView.separated(
+                  separatorBuilder: (_, __) => Divider(
+                    height: 0,
+                  ),
+                  itemCount: playlists.playlists.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    Playlist playlist = playlists.playlists[index];
+                    return ListTile(
+                      title: Text(
+                        playlist.name,
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      subtitle: Text(
+                        '${playlist.downloadedItemCount} / ${playlist.itemCount}',
+                      ),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 6,
+                      ),
+                      onTap: () {
+                        context.read<RouteNotifier>().push(
+                          RouteEnum.PLAYLIST,
+                          arguments: {'playlist': playlist},
                         );
                       },
-                    ),
-                    PopupMenuButton<String>(
-                      onSelected: (String result) {
-                        switch (result) {
-                          case 'refetch':
-                            _startRefetch(
-                              context: context,
-                              playlistId: playlist.id,
-                            );
-                            break;
+                      leading:
+                          Container(child: Image.network(playlist.imageUrl)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.play_arrow_rounded,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              _play(
+                                context: context,
+                                playlist: playlist,
+                              );
+                            },
+                          ),
+                          PopupMenuButton<String>(
+                            onSelected: (String result) {
+                              switch (result) {
+                                case 'refetch':
+                                  _startRefetch(
+                                    context: context,
+                                    playlistId: playlist.id,
+                                  );
+                                  break;
 
-                          case 'delete':
-                            _showDeleteDialog(
-                              context: context,
-                              playlistId: playlist.id,
-                            );
-                            break;
-                        }
-                      },
-                      itemBuilder: (BuildContext context) {
-                        return <PopupMenuEntry<String>>[
-                          PopupMenuItem<String>(
-                            value: 'refetch',
-                            child: Row(
-                              children: [
-                                Icon(Icons.refresh_rounded),
-                                SizedBox(width: 16),
-                                Text('Refetch songs'),
-                              ],
-                            ),
+                                case 'delete':
+                                  _showDeleteDialog(
+                                    context: context,
+                                    playlistId: playlist.id,
+                                  );
+                                  break;
+                              }
+                            },
+                            itemBuilder: (BuildContext context) {
+                              return <PopupMenuEntry<String>>[
+                                PopupMenuItem<String>(
+                                  value: 'refetch',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.refresh_rounded),
+                                      SizedBox(width: 16),
+                                      Text('Refetch songs'),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  value: 'delete',
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.delete_rounded),
+                                      SizedBox(width: 16),
+                                      Text('Delete playlist'),
+                                    ],
+                                  ),
+                                ),
+                              ];
+                            },
                           ),
-                          PopupMenuItem<String>(
-                            value: 'delete',
-                            child: Row(
-                              children: [
-                                Icon(Icons.delete_rounded),
-                                SizedBox(width: 16),
-                                Text('Delete playlist'),
-                              ],
-                            ),
-                          ),
-                        ];
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
-      ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
     );
   }
 }
