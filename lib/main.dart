@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:youcache/constants/primary_swatch.dart';
@@ -63,7 +64,7 @@ class App extends StatelessWidget {
           songsService.init(database: database, fetchService: fetchService);
           playlistsNotifier.init(playlistsService: playlistsService);
 
-          return AppNavigator();
+          return AudioServiceWidget(child: AppNavigator());
         },
       ),
     );
