@@ -37,27 +37,31 @@ class _PlaylistPageState extends State<PlaylistPage> {
     return Layout(
       title: widget.playlist.name,
       showBackButton: true,
-      child: Container(
-        child: Container(
-          padding: EdgeInsets.symmetric(
-            vertical: 8,
-          ),
-          child: ListView.separated(
-            separatorBuilder: (_, __) => Divider(),
-            itemCount: _songs.length,
-            itemBuilder: (BuildContext context, int index) {
-              final song = _songs[index];
-              final imageUrl = song.imageUrl;
-              return ListTile(
-                title: Text(song.name),
-                subtitle: Text(song.ownerChannelTitle ?? '-'),
-                leading: imageUrl == null
-                    ? null
-                    : Container(child: Image.network(imageUrl)),
-              );
-            },
-          ),
+      child: ListView.separated(
+        separatorBuilder: (_, __) => Divider(
+          height: 0,
         ),
+        itemCount: _songs.length,
+        itemBuilder: (BuildContext context, int index) {
+          final song = _songs[index];
+          final imageUrl = song.imageUrl;
+          return ListTile(
+            title: Text(
+              song.name,
+              style: TextStyle(fontSize: 14),
+            ),
+            subtitle: Text(
+              song.ownerChannelTitle ?? '-',
+              style: TextStyle(fontSize: 12),
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 6,
+            ),
+            leading: imageUrl == null
+                ? null
+                : Container(child: Image.network(imageUrl)),
+          );
+        },
       ),
     );
   }

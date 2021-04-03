@@ -61,7 +61,11 @@ class App extends StatelessWidget {
             fetchService: fetchService,
             songsService: songsService,
           );
-          songsService.init(database: database, fetchService: fetchService);
+          songsService.init(
+            database: database,
+            fetchService: fetchService,
+            playlistsNotifier: playlistsNotifier,
+          );
           playlistsNotifier.init(playlistsService: playlistsService);
 
           return AudioServiceWidget(child: AppNavigator());

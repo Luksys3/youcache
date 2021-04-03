@@ -6,7 +6,8 @@ class Song {
   final String? imageUrl;
   final String status;
   final String? ownerChannelTitle;
-  final bool downloaded;
+  bool downloaded;
+  Duration? duration;
 
   Song({
     required this.id,
@@ -17,6 +18,7 @@ class Song {
     required this.status,
     required this.ownerChannelTitle,
     required this.downloaded,
+    this.duration,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class Song {
       'status': status,
       'ownerChannelTitle': ownerChannelTitle,
       'downloaded': downloaded ? 1 : 0,
+      'duration': duration == null ? null : duration!.inSeconds,
     };
   }
 
@@ -42,6 +45,8 @@ class Song {
       status: json['status'],
       ownerChannelTitle: json['ownerChannelTitle'],
       downloaded: json['downloaded'] == 1 ? true : false,
+      duration:
+          json['duration'] == null ? null : Duration(seconds: json['duration']),
     );
   }
 }

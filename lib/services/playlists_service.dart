@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqlite_api.dart';
+import 'package:youcache/classes/audio_service_wrapper.dart';
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
 import 'package:youcache/models/playlist.dart';
@@ -31,6 +33,33 @@ class PlaylistsService with ChangeNotifier {
     _songsService = songsService;
   }
 
+  Future<void> play(Playlist playlist) async {
+    final songs = await _songsService.all(playlist.id);
+
+    List<MediaItem> queue = [];
+    for (int index = 0; index < songs.length; index++) {
+      final song = songs[index];
+      final pathToSong = await _songsService.getSongFilePath(song);
+      // print('pathToSong $index $pathToSong');
+      queue.add(
+        MediaItem(
+          // This can be any unique id, but we use the audio URL for convenience.
+          id: pathToSong,
+          album: playlist.name,
+          title: song.name,
+          artist: song.ownerChannelTitle,
+          duration: song.duration,
+          artUri: song.imageUrl == null ? null : Uri.parse(song.imageUrl!),
+        ),
+      );
+    }
+
+    await AudioServiceWrapper.start();
+
+    await AudioService.updateQueue(queue);
+    await AudioService.play();
+  }
+
   Future<List<Playlist>> all() async {
     final db = await _database.database;
 
@@ -57,7 +86,9 @@ class PlaylistsService with ChangeNotifier {
     try {
       final songsDirectory =
           Directory(await _songsService.getSongsDirectoryPath(playlistId));
-      songsDirectory.deleteSync(recursive: true);
+      if (songsDirectory.existsSync()) {
+        songsDirectory.deleteSync(recursive: true);
+      }
 
       await db.delete(
         'playlists',
@@ -172,7 +203,7 @@ class PlaylistsService with ChangeNotifier {
     return Playlist(
       id: playlistId,
       name: body['items'][0]['snippet']['title'],
-      imageUrl: body['items'][0]['snippet']['thumbnails']['default']['url'],
+      imageUrl: body['items'][0]['snippet']['thumbnails']['medium']['url'],
       itemCount: body['items'][0]['contentDetails']['itemCount'],
       downloadedItemCount: 0,
     );

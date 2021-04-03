@@ -38,6 +38,7 @@ class DatabaseService extends ChangeNotifier {
         status TEXT NOT NULL,
         ownerChannelTitle TEXT,
         downloaded INTEGER NOT NULL,
+        duration INTEGER,
         FOREIGN KEY (playlistId)
         REFERENCES playlists (id)
           ON DELETE CASCADE
@@ -50,7 +51,7 @@ class DatabaseService extends ChangeNotifier {
 
     _database = await openDatabase(
       join(await getDatabasesPath(), 'database.db'),
-      version: 14,
+      version: 15,
       onConfigure: (db) {
         db.execute("PRAGMA foreign_keys = ON;");
       },

@@ -21,17 +21,17 @@ class Layout extends StatelessWidget {
     this.floatingActionButton,
   });
 
-  int getCurrentIndex(RouteNotifier route) {
-    if (route.isActive(RouteEnum.PLAYER)) {
-      return 0;
-    } else if (route.isActive(RouteEnum.PLAYLISTS)) {
-      return 1;
-    } else if (route.isActive(RouteEnum.SETTINGS)) {
-      return 2;
-    }
+  // int getCurrentIndex(RouteNotifier route) {
+  //   if (route.isActive(RouteEnum.PLAYER)) {
+  //     return 0;
+  //   } else if (route.isActive(RouteEnum.PLAYLISTS)) {
+  //     return 1;
+  //   } else if (route.isActive(RouteEnum.SETTINGS)) {
+  //     return 2;
+  //   }
 
-    return 0;
-  }
+  //   return 0;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -72,40 +72,40 @@ class Layout extends StatelessWidget {
       ),
       backgroundColor: Color(0xff282828),
       floatingActionButton: floatingActionButton,
-      bottomNavigationBar: formPage
-          ? null
-          : BottomNavigationBar(
-              backgroundColor: Color(0xff131313),
-              selectedItemColor: PRIMARY_SWATCH[600],
-              currentIndex: getCurrentIndex(route),
-              onTap: (int index) {
-                switch (index) {
-                  case 0:
-                    route.change(RouteEnum.PLAYER);
-                    return;
-                  case 1:
-                    route.change(RouteEnum.PLAYLISTS);
-                    return;
-                  case 2:
-                    route.change(RouteEnum.SETTINGS);
-                    return;
-                }
-              },
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.play_circle_fill_rounded),
-                  label: 'Player',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.queue_music_rounded),
-                  label: 'Playlists',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.settings_rounded),
-                  label: 'Settings',
-                ),
-              ],
-            ),
+      // bottomNavigationBar: formPage
+      //     ? null
+      //     : BottomNavigationBar(
+      //         backgroundColor: Color(0xff131313),
+      //         selectedItemColor: PRIMARY_SWATCH[600],
+      //         currentIndex: getCurrentIndex(route),
+      //         onTap: (int index) {
+      //           switch (index) {
+      //             case 0:
+      //               route.change(RouteEnum.PLAYER);
+      //               return;
+      //             case 1:
+      //               route.change(RouteEnum.PLAYLISTS);
+      //               return;
+      //             case 2:
+      //               route.change(RouteEnum.SETTINGS);
+      //               return;
+      //           }
+      //         },
+      //         items: const <BottomNavigationBarItem>[
+      //           BottomNavigationBarItem(
+      //             icon: Icon(Icons.play_circle_fill_rounded),
+      //             label: 'Player',
+      //           ),
+      //           BottomNavigationBarItem(
+      //             icon: Icon(Icons.queue_music_rounded),
+      //             label: 'Playlists',
+      //           ),
+      //           BottomNavigationBarItem(
+      //             icon: Icon(Icons.settings_rounded),
+      //             label: 'Settings',
+      //           ),
+      //         ],
+      //       ),
       body: child,
     );
   }

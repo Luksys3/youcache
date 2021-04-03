@@ -7,6 +7,7 @@ import 'package:sqflite/sqlite_api.dart';
 import 'package:youcache/enums/snack_bar_type_enum.dart';
 import 'package:youcache/helpers/showSnackBar.dart';
 import 'package:youcache/models/song.dart';
+import 'package:youcache/notifiers/playlists_notifier.dart';
 import 'package:youcache/services/database_service.dart';
 import 'package:youcache/services/fetch_service.dart';
 import 'package:youcache/.env.dart' as ENV;
@@ -15,6 +16,7 @@ import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 class SongsService with ChangeNotifier {
   late DatabaseService _database;
   late FetchService _fetchService;
+  late PlaylistsNotifier _playlistsNotifier;
   final BuildContext _context;
 
   SongsService(
@@ -24,9 +26,11 @@ class SongsService with ChangeNotifier {
   init({
     required DatabaseService database,
     required FetchService fetchService,
+    required PlaylistsNotifier playlistsNotifier,
   }) {
     _database = database;
     _fetchService = fetchService;
+    _playlistsNotifier = playlistsNotifier;
   }
 
   Future<List<Song>> all(String playlistId) async {
@@ -107,9 +111,9 @@ class SongsService with ChangeNotifier {
               playlistId: playlistId,
               videoId: song['snippet']['resourceId']['videoId'],
               name: song['snippet']['title'],
-              imageUrl: song['snippet']['thumbnails']['default'] == null
+              imageUrl: song['snippet']['thumbnails']['medium'] == null
                   ? null
-                  : song['snippet']['thumbnails']['default']['url'],
+                  : song['snippet']['thumbnails']['medium']['url'],
               status: song['status']['privacyStatus'],
               ownerChannelTitle: song['snippet']['videoOwnerChannelTitle'],
               downloaded: false,
@@ -156,6 +160,9 @@ class SongsService with ChangeNotifier {
           [playlistId],
         );
         newSongsCount++;
+
+        // Refresh playlist list
+        _playlistsNotifier.load();
       }
     }
 
@@ -173,6 +180,7 @@ class SongsService with ChangeNotifier {
     try {
       final yt = YoutubeExplode();
 
+      final video = await yt.videos.get(song.videoId);
       final manifest = await yt.videos.streamsClient.getManifest(song.videoId);
 
       final streamInfo = manifest.audioOnly.withHighestBitrate();
@@ -192,6 +200,9 @@ class SongsService with ChangeNotifier {
 
       await fileStream.flush();
       await fileStream.close();
+
+      song.downloaded = true;
+      song.duration = video.duration;
     } catch (_) {
       showSnackBar(
         _context,
