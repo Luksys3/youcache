@@ -56,12 +56,8 @@ class PlaylistsService with ChangeNotifier {
       );
     }
 
-    try {
-      _play(queue: queue, song: song);
-    } catch (_) {
-      await AudioServiceWrapper.start();
-      _play(queue: queue, song: song);
-    }
+    await AudioServiceWrapper.start();
+    await _play(queue: queue, song: song);
   }
 
   Future<void> _play({required List<MediaItem> queue, Song? song}) async {

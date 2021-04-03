@@ -74,8 +74,6 @@ class _PlaylistCreatePageState extends State<PlaylistCreatePage> {
       helperText: 'Playlist must be set to be accessible via provided link.',
       name: 'link',
       onSaved: _onSaved,
-      value:
-          'https://www.youtube.com/playlist?list=PLdqLrUHHfXcWwRzR2QGeAlFRUS0yilRro',
       validator: (value) {
         if (value.isEmpty) {
           return 'This field is required.';

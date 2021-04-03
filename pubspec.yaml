@@ -39,6 +39,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.9.0
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path: "assets/icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -58,7 +64,6 @@ flutter:
   fonts:
     - family: Ubuntu
       fonts:
-        - asset: fonts/Ubuntu-Light.ttf
         - asset: fonts/Ubuntu-Regular.ttf
         - asset: fonts/Ubuntu-Medium.ttf
 
