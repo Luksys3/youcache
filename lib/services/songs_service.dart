@@ -211,7 +211,7 @@ class SongsService with ChangeNotifier {
     } catch (_) {
       showSnackBar(
         _context,
-        'Failed to download song "${song.name}".',
+        'Failed to download song "${song.name}". ${error.toString()}',
         type: SnackBarTypeEnum.ERROR,
       );
       return false;
