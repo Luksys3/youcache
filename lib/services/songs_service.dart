@@ -208,7 +208,7 @@ class SongsService with ChangeNotifier {
 
       song.downloaded = true;
       song.duration = video.duration;
-    } catch (_) {
+    } catch (error) {
       showSnackBar(
         _context,
         'Failed to download song "${song.name}". ${error.toString()}',
